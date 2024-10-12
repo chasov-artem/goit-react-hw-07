@@ -22,7 +22,7 @@ const App = () => {
       <ContactForm />
       <SearchBox />
       {isLoading && <h2>Loading...</h2>}
-      {isError && <h2>Error</h2>}
+      {isError && <h2>Error: {isError}</h2>}
       <ContactList />
     </div>
   );

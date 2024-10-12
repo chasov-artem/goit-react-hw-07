@@ -9,7 +9,7 @@ const initialState = {
   contacts: {
     items: [],
     isLoading: false,
-    isError: false,
+    isError: null,
   },
 };
 
@@ -20,6 +20,8 @@ const slice = createSlice({
     builder
       .addCase(fetchContacts.fulfilled, (state, action) => {
         state.contacts.items = action.payload;
+        state.contacts.isLoading = false;
+        state.contacts.isError = null;
       })
       .addCase(deleteContactThunk.fulfilled, (state, action) => {
         state.contacts.items = state.contacts.items.filter(
@@ -36,7 +38,7 @@ const slice = createSlice({
           addContactThunk.pending
         ),
         (state) => {
-          state.isLoading = true;
+          state.contacts.isLoading = true;
         }
       )
       .addMatcher(
@@ -45,8 +47,9 @@ const slice = createSlice({
           deleteContactThunk.rejected,
           addContactThunk.rejected
         ),
-        (state) => {
-          state.isLoading = false;
+        (state, action) => {
+          state.contacts.isLoading = false;
+          state.contacts.isError = action.payload || "Something went wrong";
         }
       )
       .addMatcher(
@@ -56,7 +59,8 @@ const slice = createSlice({
           addContactThunk.fulfilled
         ),
         (state) => {
-          state.isLoading = false;
+          state.contacts.isLoading = false;
+          state.contacts.isError = null;
         }
       );
   },
@@ -67,10 +71,3 @@ export const selectIsLoading = (state) => state.contacts.contacts.isLoading;
 export const selectIsError = (state) => state.contacts.contacts.isError;
 
 export const contactsReducer = slice.reducer;
-export const {
-  deleteContact,
-  addContact,
-  fetchDataSuccess,
-  setIsLoading,
-  setIsError,
-} = slice.actions;
