@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import {
   addContactThunk,
   deleteContactThunk,
@@ -16,27 +16,6 @@ const initialState = {
 const slice = createSlice({
   name: "contacts",
   initialState,
-  reducers: {
-    fetchDataSuccess: (state, action) => {
-      state.contacts.items = action.payload;
-      state.contacts.isLoading = false;
-    },
-    setIsLoading: (state, action) => {
-      state.contacts.isLoading = action.payload;
-    },
-    setIsError: (state, action) => {
-      state.contacts.isError = action.payload;
-      state.contacts.isLoading = false;
-    },
-    deleteContact: (state, action) => {
-      state.contacts.items = state.contacts.items.filter(
-        (item) => item.id !== action.payload
-      );
-    },
-    addContact: (state, action) => {
-      state.contacts.items.push(action.payload);
-    },
-  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchContacts.fulfilled, (state, action) => {
@@ -49,7 +28,37 @@ const slice = createSlice({
       })
       .addCase(addContactThunk.fulfilled, (state, action) => {
         state.contacts.items.push(action.payload);
-      });
+      })
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.pending,
+          deleteContactThunk.pending,
+          addContactThunk.pending
+        ),
+        (state) => {
+          state.isLoading = true;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.rejected,
+          deleteContactThunk.rejected,
+          addContactThunk.rejected
+        ),
+        (state) => {
+          state.isLoading = false;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.fulfilled,
+          deleteContactThunk.fulfilled,
+          addContactThunk.fulfilled
+        ),
+        (state) => {
+          state.isLoading = false;
+        }
+      );
   },
 });
 

@@ -5,10 +5,11 @@ import SearchBox from "./components/SearchBox/SearchBox";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchContacts } from "./redux/contactsOps";
-import { selectIsLoading } from "./redux/contactsSlice";
+import { selectIsError, selectIsLoading } from "./redux/contactsSlice";
 
 const App = () => {
   const isLoading = useSelector(selectIsLoading);
+  const isError = useSelector(selectIsError);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -21,6 +22,7 @@ const App = () => {
       <ContactForm />
       <SearchBox />
       {isLoading && <h2>Loading...</h2>}
+      {isError && <h2>Error</h2>}
       <ContactList />
     </div>
   );
